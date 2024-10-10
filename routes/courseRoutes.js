@@ -1,22 +1,28 @@
-import express from 'express';
-import { createCourse, deleteCourse, getCourseById, getCourses, updateCourse } from '../controllers/courseController.js';
+import express from "express";
+import {
+  createCourse,
+  deleteCourse,
+  getCourseById,
+  getCourses,
+  updateCourse,
+} from "../controllers/courseController.js";
 import { protect, restrictTo } from "../middleware/authMiddleware.js";
+import reviewRouter from "./reviewRoutes.js";
 
 const router = express.Router();
 
-// Route to create a new course (POST)
-router.post("/", protect, restrictTo("admin"), createCourse);
+router.use("/:courseId/reviews", reviewRouter);
 
-// Route to update a course (PATCH)
-router.patch("/:id",  protect, restrictTo("admin"), updateCourse);
-
-// Route to delete a course (DELETE)
-router.delete("/:id",  protect, restrictTo("admin"), deleteCourse);
-
-// Route to get all courses with filtering and pagination (GET)
 router.get("/", getCourses);
 
-// Route to get a single course by ID (GET)
 router.get("/:id", getCourseById);
+
+router.use(protect);
+
+router.post("/", restrictTo("admin"),createCourse);
+
+router.patch("/:id", restrictTo("admin"),updateCourse);
+
+router.delete("/:id",restrictTo("admin"), deleteCourse);
 
 export default router;

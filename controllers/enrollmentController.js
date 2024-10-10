@@ -1,0 +1,129 @@
+import Enrollment from '../models/Enrollment.js';
+import catchAsync from '../utils/catchAsync.js';
+import AppError from '../utils/AppError.js';
+
+// @desc Enroll a student in a course
+// @route POST /api/v1/enrollments
+export const enrollInCourse = catchAsync(async (req, res, next) => {
+  const { course, student } = req.body;
+
+  // Check if the student is already enrolled in the course
+  const existingEnrollment = await Enrollment.findOne({ course: course, student: student });
+
+  if (existingEnrollment) {
+    return next(new AppError('Student is already enrolled in this course', 400));
+  }
+
+  const enrollment = await Enrollment.create({
+    course: course,
+    student: student,
+    progress: 0
+  });
+
+  res.status(201).json({
+    success: true,
+    data: enrollment
+  });
+});
+
+
+// @desc Get enrollment by ID
+// @route GET /api/v1/enrollments/:id
+export const getEnrollmentById = catchAsync(async (req, res, next) => {
+  const enrollment = await Enrollment.findById(req.params.id)
+    .populate('student', 'name email')
+    .populate('course', 'title description');
+
+  if (!enrollment) {
+    return next(new AppError('Enrollment not found', 404));
+  }
+
+  res.status(200).json({
+    success: true,
+    data: enrollment,
+  });
+});
+
+// @desc Get all enrollments by student ID
+// @route GET /api/v1/enrollments/student/:studentId
+export const getEnrollmentsByStudent = catchAsync(async (req, res, next) => {
+  const enrollments = await Enrollment.find({ student: req.params.studentId })
+    .populate('course', 'title description')
+    .populate('student', 'name email');
+
+  if (!enrollments || enrollments.length === 0) {
+    return next(new AppError('No enrollments found for this student', 404));
+  }
+
+  res.status(200).json({
+    success: true,
+    count: enrollments.length,
+    data: enrollments,
+  });
+});
+
+// @desc Get all enrollments for a course
+// @route GET /api/v1/enrollments/course/:courseId
+export const getEnrollmentsByCourse = catchAsync(async (req, res, next) => {
+  const enrollments = await Enrollment.find({ course: req.params.courseId }).populate('student', 'name email');
+
+  res.status(200).json({
+    success: true,
+    count: enrollments.length,
+    data: enrollments
+  });
+});
+
+// @desc Get student enrollment for a specific course
+// @route GET /api/v1/enrollments/student/:studentId/course/:courseId
+export const getStudentEnrollment = catchAsync(async (req, res, next) => {
+  const enrollment = await Enrollment.findOne({
+    course: req.params.courseId,
+    student: req.params.studentId
+  }).populate('course', 'title description');
+
+  if (!enrollment) {
+    return next(new AppError('No enrollment found for this student and course', 404));
+  }
+
+  res.status(200).json({
+    success: true,
+    data: enrollment
+  });
+});
+
+// @desc Update progress of an enrollment
+// @route PATCH /api/v1/enrollments/:id/progress
+export const updateEnrollmentProgress = catchAsync(async (req, res, next) => {
+  const { progress } = req.body;
+
+  const enrollment = await Enrollment.findByIdAndUpdate(
+    req.params.id,
+    { progress },
+    { new: true, runValidators: true }
+  );
+
+  if (!enrollment) {
+    return next(new AppError('Enrollment not found', 404));
+  }
+
+  res.status(200).json({
+    success: true,
+    data: enrollment
+  });
+});
+
+// @desc Delete an enrollment
+// @route DELETE /api/v1/enrollments/:id
+export const deleteEnrollment = catchAsync(async (req, res, next) => {
+  const enrollment = await Enrollment.findByIdAndDelete(req.params.id);
+
+  if (!enrollment) {
+    return next(new AppError('Enrollment not found', 404));
+  }
+
+  res.status(200).json({
+    success: true,
+    message: 'Enrollment deleted successfully'
+  });
+});

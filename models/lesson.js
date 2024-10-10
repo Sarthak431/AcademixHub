@@ -1,24 +1,26 @@
 import mongoose from "mongoose";
 
 const lessonSchema = new mongoose.Schema({
-  course_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Course",
-    required: true,
-  },
   title: {
     type: String,
-    required: true,
+    required: [true, "A lesson must have a title"],
   },
   content: {
     type: String,
-    required: true,
+    required: [true, "A lesson must have content"],
   },
-  type: {
-    type: String,
-    enum: ["video", "quiz", "article"],
-    required: true,
+  duration: {
+    type: Number,
+    required: [true, "A lesson must have a duration"],
+    min: [1, "Duration must be at least 1 minute"],
   },
+  course: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Course",
+    required: [true, "A lesson must belong to a course"],
+  }
+}, {
+  timestamps: true 
 });
 
 const Lesson = mongoose.model("Lesson", lessonSchema);
