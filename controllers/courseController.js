@@ -1,4 +1,4 @@
-import course from "../models/course.js";
+import Course from "../models/Course.js";
 import AppError from '../utils/AppError.js';
 import catchAsync from "../utils/catchAsync.js";
 
@@ -7,7 +7,7 @@ import catchAsync from "../utils/catchAsync.js";
 export const createCourse = catchAsync(async (req, res, next) => {
   const { title, description, instructor, category } = req.body;
 
-  const newCourse = await course.create({
+  const newCourse = await Course.create({
     title,
     description,
     instructor,
@@ -32,7 +32,7 @@ export const updateCourse = catchAsync(async (req, res, next) => {
       return obj;
     }, {});
 
-  const updatedCourse = await course.findByIdAndUpdate(
+  const updatedCourse = await Course.findByIdAndUpdate(
     req.params.id,
     { $set: updateFields },
     { new: true, runValidators: true }
@@ -50,7 +50,7 @@ export const updateCourse = catchAsync(async (req, res, next) => {
 // @desc Delete a course
 // @route DELETE /api/v1/courses/:id
 export const deleteCourse = catchAsync(async (req, res, next) => {
-  const deletedCourse = await course.findByIdAndDelete(req.params.id);c
+  const deletedCourse = await Course.findByIdAndDelete(req.params.id);c
   if (!deletedCourse) {
     return next(new AppError("Course not found", 404));
   }
@@ -67,7 +67,7 @@ export const getCourses = catchAsync(async (req, res, next) => {
   const { category, page = 1, limit = 10 } = req.query;
   const query = category ? { category } : {};
 
-  const courses = await course.find(query)
+  const courses = await Course.find(query)
     .limit(parseInt(limit))
     .skip((page - 1) * limit);
 
@@ -81,14 +81,14 @@ export const getCourses = catchAsync(async (req, res, next) => {
 // @desc Get a single course by ID
 // @route GET /api/v1/courses/:id
 export const getCourseById = catchAsync(async (req, res, next) => {
-  const Course = await course.findById(req.params.id);//.populate("instructor lessons")
+  const course = await Course.findById(req.params.id);//.populate("instructor lessons")
 
-  if (!Course) {
+  if (!course) {
     return next(new AppError("Course not found", 404));
   }
 
   res.status(200).json({
     success: true,
-    data: Course,
+    data: course,
   });
 });

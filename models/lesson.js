@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const lessonSchema = new mongoose.Schema({
   course_id: {
-    type: Schema.Types.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     ref: "Course",
     required: true,
   },
@@ -21,6 +21,6 @@ const lessonSchema = new mongoose.Schema({
   },
 });
 
-const lesson = mongoose.model("lesson", lessonSchema);
+const Lesson = mongoose.model("Lesson", lessonSchema);
 
-export default lesson;
+export default Lesson;
