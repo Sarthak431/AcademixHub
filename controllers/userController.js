@@ -2,7 +2,7 @@ import catchAsync from "../utils/catchAsync.js";
 import User from "../models/User.js";
 import AppError from "../utils/AppError.js";
 import bcrypt from "bcryptjs";
-
+import Enrollment from "../models/Enrollment.js";
 export const getAllUsers = catchAsync(async (req, res, next) => {
   const users = await User.find().select("-__v");
   res.json(users);
@@ -73,27 +73,53 @@ export const myInfoHandler = catchAsync(async (req, res, next) => {
   if (!user) {
     return next(new AppError("User not found", 404));
   }
+
+  const enrollments = await Enrollment.find({ student: user_id })
+    .populate({
+      path: "course",
+      select: "title description instructors",
+    })
+    .populate({
+      path: "completed_lessons",
+      select: "title"
+    });
+
   res.json({
-    user: {
-      name: user.name,
-      email: user.email,
-    }
+    success: true,
+    data: {
+      user: {
+        name: user.name,
+        email: user.email,
+      },
+      enrollments,
+    },
   });
 });
 
 export const userInfoHandler = catchAsync(async (req, res, next) => {
-  const { user_id } = req.params;
+  const { id } = req.params;
 
-  const user = await User.findById(user_id).select("name email");
+  const user = await User.findById(id);
 
   if (!user) {
     return next(new AppError("User not found", 404));
   }
 
+  const enrollments = await Enrollment.find({ student: id })
+  .populate({
+    path: "course",
+    select: "title description instructors",
+  })
+  .populate({
+    path: "completed_lessons",
+    select: "title"
+  });
+  
   res.json({
-    user: {
-      name: user.name,
-      email: user.email,
-    }
+    success: true,
+    data: {
+      user,
+      enrollments,
+    },
   });
 });

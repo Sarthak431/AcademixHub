@@ -5,7 +5,7 @@ import userRoutes from "./routes/userRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import lessonRoutes from "./routes/lessonRoutes.js";
 import enrollmentRoutes from "./routes/enrollmentRoutes.js";
-
+import notFound from './utils/notFound.js';
 
 const app = express();
 
@@ -23,7 +23,7 @@ app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/lessons", lessonRoutes);
 app.use("/api/v1/enrollments", enrollmentRoutes);
 
-
+app.use(notFound);
 app.use(globalErrorHandler);
 
 export default app;

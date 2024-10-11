@@ -11,11 +11,16 @@ import {
 
 const router = express.Router();
 
-router.get("/", protect, restrictTo("admin"), getAllUsers);
-router.post("/", protect, restrictTo("admin"), addUser);
-router.patch("/:id", protect, restrictTo("admin"), updateUser);
-router.delete("/:id", protect, restrictTo("admin"), deleteUser);
-router.get("/my-info", protect, myInfoHandler);
-router.get("/:user_id", protect, restrictTo("admin"), userInfoHandler);
+router.use(protect);
+
+router.get("/my-info", myInfoHandler);
+
+router.use(restrictTo("admin"));
+
+router.get("/", getAllUsers);
+router.post("/", addUser);
+router.patch("/:id", updateUser);
+router.delete("/:id", deleteUser);
+router.get("/:id", userInfoHandler);
 
 export default router;

@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
+import Course from "./Course.js";
 
-const enrollmentSchema = new mongoose.Schema(
+const enrollment_schema = new mongoose.Schema(
   {
     student: {
       type: mongoose.Schema.Types.ObjectId,
@@ -12,7 +13,7 @@ const enrollmentSchema = new mongoose.Schema(
       ref: "Course",
       required: true,
     },
-    enrollmentDate: {
+    enrollment_date: {
       type: Date,
       default: Date.now,
     },
@@ -22,7 +23,7 @@ const enrollmentSchema = new mongoose.Schema(
       min: [0, "Progress cannot be less than 0%"],
       max: [100, "Progress cannot be more than 100%"],
     },
-    completedLessons: [
+    completed_lessons: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Lesson",
@@ -34,6 +35,20 @@ const enrollmentSchema = new mongoose.Schema(
   }
 );
 
-const Enrollment = mongoose.model("Enrollment", enrollmentSchema);
+enrollment_schema.pre("save", async function (next) {
+  const enrollment = this;
+
+  const course = await Course.findById(enrollment.course).populate("lessons");
+
+  if (course.lessons.length > 0) {
+    enrollment.progress =
+      (enrollment.completed_lessons.length / course.lessons.length) * 100;
+  } else {
+    enrollment.progress = 0;
+  }
+  next();
+});
+
+const Enrollment = mongoose.model("Enrollment", enrollment_schema);
 
 export default Enrollment;
