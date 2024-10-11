@@ -1,5 +1,4 @@
 import Course from "../models/Course.js";
-import User from "../models/User.js";
 import AppError from "../utils/AppError.js";
 import catchAsync from "../utils/catchAsync.js";
 import Enrollment from "../models/Enrollment.js";
