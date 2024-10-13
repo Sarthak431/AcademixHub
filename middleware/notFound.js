@@ -1,8 +1,8 @@
-
-import AppError from '../utils/AppError.js';
-
-const notFound = (req, res, next) => {
-  next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
+const notFound = (req, res) => {
+  return res.status(404).json({
+    status: 'fail',
+    message: `Can't find ${req.originalUrl} on this server!`
+  });
 };
 
 export default notFound;
