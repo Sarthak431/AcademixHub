@@ -12,7 +12,7 @@ const router = express.Router();
 
 router.use(protect);
 
-router.post("/", enrollInCourse);
+router.post("/", restrictTo("student"), enrollInCourse);
 
 router.get(
   "/course/:courseId",

@@ -43,8 +43,8 @@ const courseSchema = new mongoose.Schema(
       max: [5, "Rating must be at most 5"],
       set: function (value) {
         return Math.round(value * 10) / 10;
-      },
-    },
+      }
+    }
   },
   {
     timestamps: true,

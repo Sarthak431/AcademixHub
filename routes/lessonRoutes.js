@@ -14,10 +14,13 @@ const router = express.Router();
 router.use(protect);
 
 router.get("/course/:courseId", getLessonsByCourse);
-router.patch("/:id/complete", completeLesson);
+
 router.get("/:id", getLessonById);
 
+router.patch("/:id/complete", restrictTo("student"), completeLesson);
+
 router.use(restrictTo("admin", "instructor"));
+
 router.post("/", createLesson);
 
 router.patch("/:id", updateLesson);

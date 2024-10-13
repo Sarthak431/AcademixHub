@@ -1,9 +1,10 @@
 import express from "express";
 import {
   createReview,
-  getReviewsForCourse,
+  getReviews,
   updateReview,
   deleteReview,
+  getReviewById
 } from "../controllers/reviewController.js";
 import { protect, restrictTo } from "../middleware/authMiddleware.js";
 
@@ -13,7 +14,9 @@ router.use(protect);
 
 router.post("/", restrictTo("student"), createReview);
 
-router.get("/", getReviewsForCourse);
+router.get("/", getReviews);
+
+router.get("/:id", getReviewById);
 
 router.use(restrictTo("admin","student"));
 

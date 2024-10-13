@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import Course from "./Course.js";
 
-const enrollment_schema = new mongoose.Schema(
+const enrollmentSchema = new mongoose.Schema(
   {
     student: {
       type: mongoose.Schema.Types.ObjectId,
@@ -35,7 +35,7 @@ const enrollment_schema = new mongoose.Schema(
   }
 );
 
-enrollment_schema.pre("save", async function (next) {
+enrollmentSchema.pre("save", async function (next) {
   const enrollment = this;
 
   const course = await Course.findById(enrollment.course).populate("lessons");
@@ -49,6 +49,6 @@ enrollment_schema.pre("save", async function (next) {
   next();
 });
 
-const Enrollment = mongoose.model("Enrollment", enrollment_schema);
+const Enrollment = mongoose.model("Enrollment", enrollmentSchema);
 
 export default Enrollment;

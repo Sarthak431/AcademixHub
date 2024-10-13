@@ -72,8 +72,7 @@ reviewSchema.pre("findOneAndDelete", async function (next) {
         { $group: { _id: "$course", averageRating: { $avg: "$rating" } } },
       ]);
 
-      course.rating =
-        result.length > 0 ? Math.round(result[0].averageRating * 10) / 10 : 0;
+      course.rating = result.length > 0 ? Math.round(result[0].averageRating * 10) / 10 : 0;
 
       await course.save();
     }

@@ -9,8 +9,8 @@ export const enrollInCourse = catchAsync(async (req, res, next) => {
 
   // Check if the student is already enrolled in the course
   const existingEnrollment = await Enrollment.findOne({
-    course: course,
-    student: student,
+    course,
+    student
   });
 
   if (existingEnrollment) {
@@ -20,8 +20,8 @@ export const enrollInCourse = catchAsync(async (req, res, next) => {
   }
 
   const enrollment = await Enrollment.create({
-    course: course,
-    student: student,
+    course,
+    student,
   });
 
   res.status(201).json({
@@ -53,10 +53,6 @@ export const getEnrollmentsByStudent = catchAsync(async (req, res, next) => {
   const enrollments = await Enrollment.find({ student: req.params.studentId })
     .populate("course", "title description")
     .populate("student", "name email");
-
-  if (!enrollments || enrollments.length === 0) {
-    return next(new AppError("No enrollments found for this student", 404));
-  }
 
   res.status(200).json({
     success: true,

@@ -17,12 +17,12 @@ router.get("/", getCourses);
 
 router.get("/:id", getCourseById);
 
-router.use(protect);
+router.use(protect, restrictTo("admin", "instructor"));
 
-router.post("/", restrictTo("admin"),createCourse);
+router.post("/", createCourse);
 
-router.patch("/:id", restrictTo("admin"),updateCourse);
+router.patch("/:id", updateCourse);
 
-router.delete("/:id",restrictTo("admin"), deleteCourse);
+router.delete("/:id", deleteCourse);
 
 export default router;

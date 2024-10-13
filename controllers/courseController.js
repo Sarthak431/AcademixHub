@@ -33,6 +33,11 @@ export const createCourse = catchAsync(async (req, res, next) => {
 // @desc Update course details
 // @route PATCH /api/v1/courses/:id
 export const updateCourse = catchAsync(async (req, res, next) => {
+  const course = await Course.findById(req.params.id);
+
+  if (!course) {
+    return next(new AppError("Course not found", 404));
+  }
   const allowedFields = [
     "title",
     "description",
@@ -41,6 +46,9 @@ export const updateCourse = catchAsync(async (req, res, next) => {
     "instructors",
   ];
 
+  // Find the course by ID first
+  
+
   // Filter out only the allowed fields from the request body
   const updateFields = Object.keys(req.body)
     .filter((key) => allowedFields.includes(key))
@@ -48,13 +56,6 @@ export const updateCourse = catchAsync(async (req, res, next) => {
       obj[key] = req.body[key];
       return obj;
     }, {});
-
-  // Find the course by ID first
-  const course = await Course.findById(req.params.id);
-
-  if (!course) {
-    return next(new AppError("Course not found", 404));
-  }
 
   // Update course fields manually
   Object.keys(updateFields).forEach((field) => {
@@ -101,7 +102,9 @@ export const deleteCourse = catchAsync(async (req, res, next) => {
 // @route GET /api/v1/courses
 export const getCourses = catchAsync(async (req, res, next) => {
   const { category, page = 1, limit = 10 } = req.query;
-  const query = category ? { category } : {};
+
+  // Modify the query to make the category search case-insensitive
+  const query = category ? { category: { $regex: new RegExp(category, "i") } } : {};
 
   const courses = await Course.find(query)
     .limit(parseInt(limit))
