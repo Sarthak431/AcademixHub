@@ -22,6 +22,7 @@ export const createCourse = catchAsync(async (req, res, next) => {
     instructors: instructorsWithId,  // Now it's an array of objects with _id.
     category,
     lessons: lessons || [],
+    createdBy: req.user._id,
   });
 
   res.status(201).json({
@@ -38,6 +39,18 @@ export const updateCourse = catchAsync(async (req, res, next) => {
   if (!course) {
     return next(new AppError("Course not found", 404));
   }
+
+  // Check if the user is the creator, an instructor, or an admin
+  const isCreator = course.createdBy.toString() === req.user._id.toString();
+  const isInstructor = course.instructors.some(
+    (instructor) => instructor._id.toString() === req.user._id.toString()
+  );
+  const isAdmin = req.user.role === 'admin';
+
+  if (!isCreator && !isInstructor && !isAdmin) {
+    return next(new AppError("You do not have permission to update this course", 403));
+  }
+
   const allowedFields = [
     "title",
     "description",
@@ -45,9 +58,6 @@ export const updateCourse = catchAsync(async (req, res, next) => {
     "category",
     "instructors",
   ];
-
-  // Find the course by ID first
-  
 
   // Filter out only the allowed fields from the request body
   const updateFields = Object.keys(req.body)
@@ -81,20 +91,29 @@ export const updateCourse = catchAsync(async (req, res, next) => {
 // @desc Delete a course
 // @route DELETE /api/v1/courses/:id
 export const deleteCourse = catchAsync(async (req, res, next) => {
-  const deletedCourse = await Course.findByIdAndDelete(req.params.id);
+  const course = await Course.findById(req.params.id);
 
-  if (!deletedCourse) {
+  if (!course) {
     return next(new AppError("Course not found", 404));
   }
 
+  // Check if the user is the creator or an admin
+  const isCreator = course.createdBy.toString() === req.user._id.toString();
+  const isAdmin = req.user.role === 'admin';
+
+  if (!isCreator && !isAdmin) {
+    return next(new AppError("You do not have permission to delete this course", 403));
+  }
+
+  // Proceed with course deletion
+  await course.remove();
   await Lesson.deleteMany({ course: req.params.id });
   await Review.deleteMany({ course: req.params.id });
   await Enrollment.deleteMany({ course: req.params.id });
 
   res.status(200).json({
     success: true,
-    message:
-      "Course, associated lessons, reviews, and enrollments deleted successfully",
+    message: "Course, associated lessons, reviews, and enrollments deleted successfully",
   });
 });
 
@@ -113,11 +132,11 @@ export const getCourses = catchAsync(async (req, res, next) => {
     .populate("lessons", "title duration"); // Populate lessons
 
   // Format instructors to match desired structure
-  const formattedCourses = courses.map(course => ({
+  const formattedCourses = courses.map((course) => ({
     _id: course._id,
     title: course.title,
     description: course.description,
-    instructors: course.instructors.map(instructor => ({
+    instructors: course.instructors.map((instructor) => ({
       _id: instructor._id._id, // Access the instructor's _id from the populated _id
       name: instructor.name || instructor._id.name, // Ensure name is included
       email: instructor._id.email, // Access the email from the populated _id
@@ -148,7 +167,7 @@ export const getCourseById = catchAsync(async (req, res, next) => {
   }
 
   // Format instructors correctly
-  const formattedInstructors = course.instructors.map(instructor => ({
+  const formattedInstructors = course.instructors.map((instructor) => ({
     _id: instructor._id._id, // Access the instructor's _id from the populated _id
     name: instructor.name || instructor._id.name, // Ensure name is included
     email: instructor._id.email,

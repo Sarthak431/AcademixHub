@@ -3,20 +3,18 @@ import User from "../models/User.js";
 import AppError from "../utils/AppError.js";
 import bcrypt from "bcryptjs";
 import Enrollment from "../models/Enrollment.js";
+import Review from "../models/Review.js"; // Import the Review model
 
 export const getAllUsers = catchAsync(async (req, res, next) => {
   const { role } = req.query;
 
-  // Modify the query to allow case-insensitive role search
   const query = role ? { role: { $regex: new RegExp(role, "i") } } : {};
 
-  // Fetch users based on the query, excluding the __v field
   const users = await User.find(query).select("-__v");
 
-  // Return the total count and the user data
   res.status(200).json({
     success: true,
-    count: users.length, // Add the count of users
+    count: users.length,
     data: users,
   });
 });
@@ -50,7 +48,7 @@ export const updateUser = catchAsync(async (req, res, next) => {
 
   const user = await User.findByIdAndUpdate(id, updates, {
     new: true,
-    runValidators: true
+    runValidators: true,
   });
 
   if (!user) {
@@ -67,11 +65,22 @@ export const updateUser = catchAsync(async (req, res, next) => {
 
 export const deleteUser = catchAsync(async (req, res, next) => {
   const { id } = req.params;
-  const user = await User.findByIdAndDelete(id);
 
+  // Check if the user exists
+  const user = await User.findById(id);
   if (!user) {
     return next(new AppError("User not found", 404));
   }
+
+  // If the user is a student, delete their enrollments and reviews
+  if (user.role === 'student') {
+    await Enrollment.deleteMany({ student: id });
+    await Review.deleteMany({ user: id });
+  }
+
+  // Delete the user
+  await User.findByIdAndDelete(id);
+
   res.json({
     status: "success",
     message: "User deleted successfully",
@@ -90,11 +99,11 @@ export const myInfoHandler = catchAsync(async (req, res, next) => {
   const enrollments = await Enrollment.find({ student: user_id })
     .populate({
       path: "course",
-      select: "title description instructors"
+      select: "title description instructors",
     })
     .populate({
       path: "completed_lessons",
-      select: "title"
+      select: "title",
     });
 
   res.json({
@@ -119,15 +128,15 @@ export const userInfoHandler = catchAsync(async (req, res, next) => {
   }
 
   const enrollments = await Enrollment.find({ student: id })
-  .populate({
-    path: "course",
-    select: "title description instructors",
-  })
-  .populate({
-    path: "completed_lessons",
-    select: "title"
-  });
-  
+    .populate({
+      path: "course",
+      select: "title description instructors",
+    })
+    .populate({
+      path: "completed_lessons",
+      select: "title",
+    });
+
   res.json({
     success: true,
     data: {

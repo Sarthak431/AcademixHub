@@ -43,8 +43,13 @@ const courseSchema = new mongoose.Schema(
       max: [5, "Rating must be at most 5"],
       set: function (value) {
         return Math.round(value * 10) / 10;
-      }
-    }
+      },
+    },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: [true, "A course must have a creator"],
+    },
   },
   {
     timestamps: true,
@@ -68,8 +73,6 @@ courseSchema.pre("save", async function (next) {
   }
   next();
 });
-
-
 
 const Course = mongoose.model("Course", courseSchema);
 

@@ -9,10 +9,10 @@ export const createReview = catchAsync(async (req, res, next) => {
   const { rating, review } = req.body;
 
   // Ensure the course exists
-  let filter = {
+  const filter = {
     _id: req.params.courseId ? req.params.courseId : req.body.course,
   };
-  const course = await Course.find(filter);
+  const course = await Course.findById(filter._id);
   if (!course) {
     return next(new AppError("Course not found", 404));
   }
@@ -32,13 +32,27 @@ export const createReview = catchAsync(async (req, res, next) => {
 });
 
 // @desc Get all reviews for a course
+// @route GET /api/v1/courses/:courseId/reviews or /api/v1/reviews
+export const getReviews = catchAsync(async (req, res, next) => {
+  const filter = req.params.courseId ? { course: req.params.courseId } : {};
+  
+  const reviews = await Review.find(filter);
+
+  res.status(200).json({
+    success: true,
+    count: reviews.length,
+    data: reviews,
+  });
+});
+
+// @desc Get a review by ID
 // @route GET /api/v1/courses/:courseId/reviews/:id or /api/v1/reviews/:id
 export const getReviewById = catchAsync(async (req, res, next) => {
-  let filter = {
+  const filter = {
     _id: req.params.id,
   };
 
-  const review = await Review.find(filter);
+  const review = await Review.findById(filter._id);
 
   if (!review) {
     return next(new AppError("Review not found", 404));
@@ -50,36 +64,31 @@ export const getReviewById = catchAsync(async (req, res, next) => {
   });
 });
 
-// @desc Get all reviews for a course
-// @route GET /api/v1/courses/:courseId/reviews or or /api/v1/reviews
-export const getReviews = catchAsync(async (req, res, next) => {
-  let filter = { };
-  if(req.params.courseId)
-    filter = { course: req.params.courseId };
-
-  const reviews = await Review.find(filter);
-
-  res.status(200).json({
-    success: true,
-    count: reviews.length,
-    data: reviews,
-  });
-});
-
 // @desc Update a review
 // @route PATCH /api/v1/courses/:courseId/reviews/:id or /api/v1/reviews/:id
 export const updateReview = catchAsync(async (req, res, next) => {
   const { rating, review } = req.body;
+  const reviewId = req.params.id;
+
+  // Check if the review exists
+  const existingReview = await Review.findById(reviewId);
+  if (!existingReview) {
+    return next(new AppError("Review not found", 404));
+  }
+
+  // Check if the user is allowed to update the review
+  const isAdmin = req.user.role === "admin"; // Assuming `req.user.role` is set for authenticated users
+  const isCreator = existingReview.user.toString() === req.user.id;
+
+  if (!isAdmin && !isCreator) {
+    return next(new AppError("You are not authorized to update this review", 403));
+  }
 
   const updatedReview = await Review.findByIdAndUpdate(
-    req.params.id,
+    reviewId,
     { rating, review },
     { new: true, runValidators: true }
   );
-
-  if (!updatedReview) {
-    return next(new AppError("Review not found", 404));
-  }
 
   res.status(200).json({
     success: true,
@@ -90,11 +99,23 @@ export const updateReview = catchAsync(async (req, res, next) => {
 // @desc Delete a review
 // @route DELETE /api/v1/courses/:courseId/reviews/:id or /api/v1/reviews/:id
 export const deleteReview = catchAsync(async (req, res, next) => {
-  const review = await Review.findByIdAndDelete(req.params.id);
+  const reviewId = req.params.id;
 
-  if (!review) {
+  // Check if the review exists
+  const existingReview = await Review.findById(reviewId);
+  if (!existingReview) {
     return next(new AppError("Review not found", 404));
   }
+
+  // Check if the user is allowed to delete the review
+  const isAdmin = req.user.role === "admin";
+  const isCreator = existingReview.user.toString() === req.user.id;
+
+  if (!isAdmin && !isCreator) {
+    return next(new AppError("You are not authorized to delete this review", 403));
+  }
+
+  await Review.findByIdAndDelete(reviewId);
 
   res.status(204).json({
     success: true,
