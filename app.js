@@ -14,10 +14,12 @@ import reviewRoutes from "./routes/reviewRoutes.js";
 import enrollmentRoutes from "./routes/enrollmentRoutes.js";
 import notFound from './utils/notFound.js';
 import compression from 'compression';
+import morgan from "morgan";
 
 
 const app = express();
 
+app.use(morgan('dev'));
 // Security Middleware
 app.use(helmet()); // Set security HTTP headers
 app.use(express.json()); // Parse JSON bodies

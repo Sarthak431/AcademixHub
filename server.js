@@ -1,68 +1,51 @@
 import app from "./app.js";
 import mongoose from "mongoose";
-import { createLogger, transports, format } from "winston"; // For logging
-
-
 
 const PORT = process.env.PORT || 3000;
 
-// Replace <db_password> with actual password from environment variable
-const DB_STRING = process.env.DB_STRING.replace(
-  "<db_password>",
-  process.env.DB_PASSWORD
-);
-
-// Logger configuration
-const logger = createLogger({
-  level: "info",
-  format: format.combine(
-    format.timestamp(),
-    format.json()
-  ),
-  transports: [
-    new transports.Console(),
-    new transports.File({ filename: "error.log", level: "error" }),
-    new transports.File({ filename: "combined.log" })
-  ]
-});
+const DB_STRING = process.env.DB_STRING.replace("<db_password>", process.env.DB_PASSWORD);
 
 // Function to connect to MongoDB
 const connectDB = async () => {
   try {
     await mongoose.connect(DB_STRING);
-    logger.info("Connected to MongoDB");
+    console.log("Connected to MongoDB");
   } catch (error) {
-    logger.error("Error connecting to MongoDB:", error);
-    process.exit(1); // Exit process if there's an error
+    console.error("Error connecting to MongoDB:", error);
+    process.exit(1);
   }
 };
 
 // Start the server
 const startServer = async () => {
-  await connectDB(); // Ensure MongoDB connection is established
-
+  await connectDB();
   app.listen(PORT, () => {
-    logger.info(`Server is running on PORT ${PORT}`);
+    console.log(`Server is running on PORT ${PORT}`);
   });
 };
 
-// Graceful shutdown function
+// Graceful shutdown
 const gracefulShutdown = async (signal) => {
-  logger.info(`Received ${signal}. Shutting down gracefully...`);
-  mongoose.connection.close(() => {
-    logger.info("MongoDB connection closed.");
-    process.exit(0);
-  });
+  console.log(`Received ${signal}. Shutting down...`);
+  await mongoose.connection.close();
+  console.log("MongoDB connection closed.");
+  process.exit(0);
 };
 
-// Handle process termination signals
+// Handle termination signals
 process.on("SIGINT", () => gracefulShutdown("SIGINT"));
 process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
 
 // Handle unhandled promise rejections
 process.on("unhandledRejection", (error) => {
-  logger.error("Unhandled promise rejection:", error);
-  gracefulShutdown(); // Call graceful shutdown
+  console.error("Unhandled promise rejection:", error);
+  gracefulShutdown("Unhandled promise rejection");
+});
+
+// Handle uncaught exceptions
+process.on("uncaughtException", (error) => {
+  console.error("Uncaught exception:", error);
+  gracefulShutdown("Uncaught exception");
 });
 
 // Start the application
