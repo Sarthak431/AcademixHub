@@ -22,3 +22,9 @@
 {"level":"info","message":"Server is running on PORT 3000","timestamp":"2024-10-13T19:45:51.644Z"}
 {"level":"info","message":"Connected to MongoDB","timestamp":"2024-10-13T20:06:03.526Z"}
 {"level":"info","message":"Server is running on PORT 3000","timestamp":"2024-10-13T20:06:03.531Z"}
+{"level":"info","message":"Connected to MongoDB","timestamp":"2024-10-13T20:07:20.292Z"}
+{"level":"info","message":"Server is running on PORT 3000","timestamp":"2024-10-13T20:07:20.297Z"}
+{"level":"info","message":"Connected to MongoDB","timestamp":"2024-10-13T20:07:45.734Z"}
+{"level":"info","message":"Server is running on PORT 3000","timestamp":"2024-10-13T20:07:45.741Z"}
+{"level":"info","message":"Received SIGINT. Shutting down gracefully...","timestamp":"2024-10-13T20:07:48.833Z"}
+{"level":"info","message":"Connected to MongoDB","timestamp":"2024-10-13T20:08:03.937Z"}
