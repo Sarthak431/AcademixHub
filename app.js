@@ -12,7 +12,7 @@ import authRoutes from "./routes/authRoutes.js";
 import lessonRoutes from "./routes/lessonRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
 import enrollmentRoutes from "./routes/enrollmentRoutes.js";
-import notFound from './utils/notFound.js';
+import notFound from './middleware/notFound.js';
 import compression from 'compression';
 import morgan from "morgan";
 
