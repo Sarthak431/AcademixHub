@@ -2,6 +2,7 @@ import User from "../models/User.js";
 import jwt from "jsonwebtoken";
 import catchAsync from "../utils/catchAsync.js";
 import AppError from "../utils/AppError.js";
+import { sendWelcomeEmail } from "../utils/emailService.js";
 
 const signToken = (userId) => {
   return jwt.sign({ userId }, process.env.JWT_SECRET, {
@@ -25,6 +26,8 @@ export const signup = catchAsync(async (req, res, next) => {
   await user.save();
 
   const token = signToken(user._id);
+  
+  await sendWelcomeEmail(email, name);
 
   res.status(201).json({
     message: "user registered successfully",

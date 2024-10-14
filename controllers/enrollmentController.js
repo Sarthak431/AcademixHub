@@ -1,16 +1,19 @@
 import Enrollment from "../models/Enrollment.js";
 import catchAsync from "../utils/catchAsync.js";
 import AppError from "../utils/AppError.js";
+import User from "../models/User.js";
+import Course from "../models/Course.js";
+import { sendEnrollmentEmail } from "../utils/emailService.js";
 
 // @desc Enroll a student in a course
 // @route POST /api/v1/enrollments
 export const enrollInCourse = catchAsync(async (req, res, next) => {
-  const { course, student } = req.body;
-
+  const { course } = req.body;
+  
   // Check if the student is already enrolled in the course
   const existingEnrollment = await Enrollment.findOne({
     course,
-    student
+    student: req.user.id
   });
 
   if (existingEnrollment) {
@@ -21,9 +24,14 @@ export const enrollInCourse = catchAsync(async (req, res, next) => {
 
   const enrollment = await Enrollment.create({
     course,
-    student,
+    student: req.user.id
   });
 
+  const curCourse = await Course.findById(course); 
+  const curUser = await User.findById(req.user.id); 
+
+  await sendEnrollmentEmail(curUser.email, curCourse.title,curCourse.id, curUser.name);
+  
   res.status(201).json({
     success: true,
     data: enrollment,
