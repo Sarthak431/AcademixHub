@@ -33,6 +33,8 @@ const reviewSchema = new mongoose.Schema(
   }
 );
 
+reviewSchema.index({ user: 1, course: 1 }, { unique: true });
+
 const calculateAverageRating = async function (courseId) {
   const reviews = await mongoose.model("Review").find({ course: courseId });
   const totalReviews = reviews.length;

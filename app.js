@@ -16,22 +16,25 @@ import notFound from './middleware/notFound.js';
 import compression from 'compression';
 import morgan from "morgan";
 
-
 const app = express();
-//logger
-app.use(morgan('dev'));
+
+// Logger - Use in development mode only
+if (process.env.NODE_ENV === "development") {
+    app.use(morgan('dev'));
+}
+
 // Security Middleware
 app.use(helmet()); // Set security HTTP headers
+app.use(compression()); // Compress response bodies
 app.use(express.json()); // Parse JSON bodies
-app.use(compression());
 
 // Enable CORS with options
 app.use(cors());
 
 // Rate Limiting
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // Limit each IP to 100 requests per windowMs
 });
 app.use('/api', limiter); // Apply to all requests starting with /api
 
@@ -40,8 +43,9 @@ app.use(mongoSanitize()); // Sanitize data against NoSQL query injection
 app.use(xss()); // Prevent XSS attacks
 app.use(hpp()); // Prevent HTTP Parameter Pollution
 
+// Health Check Endpoint
 app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'ok' });
+    res.status(200).json({ status: 'ok', timestamp: new Date() });
 });
 
 // Define Routes

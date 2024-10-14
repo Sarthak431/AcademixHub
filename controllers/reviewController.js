@@ -2,11 +2,20 @@ import Review from "../models/Review.js";
 import Course from "../models/Course.js";
 import catchAsync from "../utils/catchAsync.js";
 import AppError from "../utils/AppError.js";
+import Enrollment from "../models/Enrollment.js";
 
 // @desc Create a new review
 // @route POST /api/v1/courses/:courseId/reviews or /api/v1/reviews
 export const createReview = catchAsync(async (req, res, next) => {
   const { rating, review } = req.body;
+
+  // Validate input
+  if (!rating || rating < 1 || rating > 5) {
+    return next(new AppError("Rating must be between 1 and 5", 400));
+  }
+  if (!review || review.trim() === '') {
+    return next(new AppError("Review cannot be empty", 400));
+  }
 
   // Ensure the course exists
   const filter = {
@@ -17,12 +26,32 @@ export const createReview = catchAsync(async (req, res, next) => {
     return next(new AppError("Course not found", 404));
   }
 
+  // Check if the user is enrolled in the course
+  const isEnrolled = await Enrollment.findOne({
+    student: req.user.id,
+    course: filter._id,
+  });
+
+  if (!isEnrolled) {
+    return next(new AppError("You must be enrolled in this course to leave a review", 403));
+  }
+
+  // Check for duplicate review
+  const existingReview = await Review.findOne({
+    user: req.user.id,
+    course: filter._id,
+  });
+
+  if (existingReview) {
+    return next(new AppError("You have already reviewed this course", 400));
+  }
+
   // Create a review
   const newReview = await Review.create({
     review,
     rating,
     course: filter._id,
-    user: req.user.id, // Assuming `req.user` contains the authenticated user's ID
+    user: req.user.id,
   });
 
   res.status(201).json({
@@ -30,6 +59,7 @@ export const createReview = catchAsync(async (req, res, next) => {
     data: newReview,
   });
 });
+
 
 // @desc Get all reviews for a course
 // @route GET /api/v1/courses/:courseId/reviews or /api/v1/reviews
