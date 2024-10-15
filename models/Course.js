@@ -50,6 +50,11 @@ const courseSchema = new mongoose.Schema(
       ref: "User",
       required: [true, "A course must have a creator"],
     },
+    price: {
+      type: Number,
+      required: [true, "A course must have a price"],
+      min: [0, "Price must be at least 0"],
+    },
   },
   {
     timestamps: true,
