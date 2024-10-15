@@ -109,7 +109,7 @@ export const getLessonById = catchAsync(async (req, res, next) => {
   console.log(`Extracted Public ID for signed URL: ${publicId}`); // Log public ID for debugging
 
   // Generate a signed URL for the video
-  const signedVideoUrl = generateSignedUrl(publicId, 3600); // Expires in 1 hour
+  const signedVideoUrl = generateSignedUrl(publicId, 2*lesson.duration*60);
 
   // Send the lesson data, including the signed video URL
   res.status(200).json({
