@@ -80,14 +80,19 @@ export const getLessonById = catchAsync(async (req, res, next) => {
     return next(new AppError("Lesson not found", 404));
   }
 
-  // Check if the user is enrolled in the course
-  const enrollment = await Enrollment.findOne({
-    student: req.user.id,
-    course: lesson.course._id,
-  });
+  // Check if the user is an admin
+  const isAdmin = req.user.role === "admin";
 
-  if (!enrollment) {
-    return next(new AppError("You are not enrolled in this course", 403));
+  // If the user is not an admin, check if they are enrolled in the course
+  if (!isAdmin) {
+    const enrollment = await Enrollment.findOne({
+      student: req.user.id,
+      course: lesson.course._id,
+    });
+
+    if (!enrollment) {
+      return next(new AppError("You are not enrolled in this course", 403));
+    }
   }
 
   // Extract the public ID from the video URL using the same logic as in updateLesson
@@ -128,7 +133,6 @@ export const getLessonsByCourse = catchAsync(async (req, res, next) => {
     data: lessons,
   });
 });
-
 
 
 // @desc Update a lesson
