@@ -145,3 +145,65 @@ export const userInfoHandler = catchAsync(async (req, res, next) => {
     },
   });
 });
+
+export const updateMe = catchAsync(async (req, res, next) => {
+  const { name, email, contact } = req.body;
+
+  // Ensure no password is being updated here
+  if (req.body.password) {
+    return next(new AppError('This route is not for updating password. Please use /update-password', 400));
+  }
+
+  // Update the current user (exclude sensitive fields like password)
+  const updatedUser = await User.findByIdAndUpdate(
+    req.user.id,
+    { name, email, contact },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+
+  if (!updatedUser) {
+    return next(new AppError('User not found', 404));
+  }
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      user: updatedUser,
+    },
+  });
+});
+
+// Update the current user's password
+export const updatePassword = catchAsync(async (req, res, next) => {
+  const { currentPassword, newPassword, passwordConfirm } = req.body;
+
+  // 1. Get the user from the database
+  const user = await User.findById(req.user.id).select('+password');
+
+  if (!user) {
+    return next(new AppError('User not found', 404));
+  }
+
+  // 2. Check if the posted current password is correct
+  const isCorrectPassword = await user.correctPassword(currentPassword, user.password);
+  if (!isCorrectPassword) {
+    return next(new AppError('Your current password is incorrect', 401));
+  }
+
+  // 3. Check if new password and passwordConfirm match
+  if (newPassword !== passwordConfirm) {
+    return next(new AppError('New password and confirm password do not match', 400));
+  }
+
+  // 4. If so, update the password
+  user.password = newPassword;
+  await user.save(); // use save(), not findByIdAndUpdate, to trigger pre-save middleware
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Password updated successfully',
+  });
+});

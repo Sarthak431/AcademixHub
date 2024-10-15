@@ -5,6 +5,8 @@ import {
   deleteUser,
   getAllUsers,
   myInfoHandler,
+  updateMe,
+  updatePassword,
   updateUser,
   userInfoHandler,
 } from "../controllers/userController.js";
@@ -13,7 +15,9 @@ const router = express.Router();
 
 router.use(protect);
 
-router.get("/my-info", myInfoHandler);
+router.get("/myInfo", myInfoHandler);
+router.patch("/updateMe", updateMe);
+router.patch("/updatePassword", updatePassword);
 
 router.use(restrictTo("admin"));
 
