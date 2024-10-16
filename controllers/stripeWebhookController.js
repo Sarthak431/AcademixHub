@@ -38,7 +38,7 @@ export const stripeWebhook = async (req, res) => {
         // Enroll the user in the course
         await Enrollment.create({ student: user.id, course: course.id });
         console.log(`✅  User ${user.name} enrolled in course ${course.title}`);
-        await sendEnrollmentEmail(user.email, course.title, course.id, user.name);
+        await sendEnrollmentEmail(user.email, course.title, course.id, user.name,`${req.protocol}://${req.get('host')}`);
     } else {
         console.error(`⚠️  User or Course not found. User email: ${session.customer_email}, Course ID: ${session.metadata.courseId}`);
         return res.status(404).send('User or Course not found.');

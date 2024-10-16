@@ -94,7 +94,7 @@ export const signup = catchAsync(async (req, res, next) => {
 
   const token = signToken(user._id);
   
-  await sendWelcomeEmail(email, name);
+  await sendWelcomeEmail(email, name,`${req.protocol}://${req.get('host')}`);
 
   res.status(201).json({
     message: "User registered successfully",

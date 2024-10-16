@@ -12,7 +12,7 @@ const client = SibApiV3Sdk.ApiClient.instance;
 client.authentications['api-key'].apiKey = process.env.BREVO_API_KEY; // Ensure this is in your environment variables
 
 // Function to send a welcome email when a user signs up
-export const sendWelcomeEmail = async (email, username) => {
+export const sendWelcomeEmail = async (email, username, url) => {
   const emailApi = new SibApiV3Sdk.TransactionalEmailsApi();
   
   // Read the welcome email HTML template
@@ -28,7 +28,7 @@ export const sendWelcomeEmail = async (email, username) => {
   // Replace placeholders in the template with actual values
   htmlContent = htmlContent
     .replace('{{username}}', username)
-    .replace('{{url}}', `${req.protocol}://${req.get('host')}`)
+    .replace('{{url}}', url)
     .replace('{{year}}', new Date().getFullYear());
 
   const mailOptions = {
@@ -48,7 +48,7 @@ export const sendWelcomeEmail = async (email, username) => {
 };
 
 // Function to send an enrollment confirmation email when a student enrolls in a course
-export const sendEnrollmentEmail = async (email, courseName, courseId, studentName) => {
+export const sendEnrollmentEmail = async (email, courseName, courseId, studentName,url) => {
   const emailApi = new SibApiV3Sdk.TransactionalEmailsApi();
 
   const templatePath = path.join(__dirname, 'templates', 'enrollmentEmail.html');
@@ -65,7 +65,7 @@ export const sendEnrollmentEmail = async (email, courseName, courseId, studentNa
     .replace('{{studentName}}', studentName)
     .replace('{{courseName}}', courseName)
     .replace('{{courseId}}', courseId)
-    .replace('{{url}}', `${req.protocol}://${req.get('host')}`)
+    .replace('{{url}}', url)
     .replace('{{year}}', year);
 
   const mailOptions = {
