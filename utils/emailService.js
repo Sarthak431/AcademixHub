@@ -117,3 +117,39 @@ export const sendResetPasswordEmail = async (email, resetUrl) => {
       throw new Error('Failed to send reset password email');
   }
 };
+
+
+export const sendEnrollmentPaymentEmail = async (email, checkoutUrl, courseName, studentName) => {
+  const emailApi = new SibApiV3Sdk.TransactionalEmailsApi();
+
+  const templatePath = path.join(__dirname, 'templates', 'enrollmentPaymentEmail.html');
+  let htmlContent;
+  try {
+    htmlContent = fs.readFileSync(templatePath, 'utf-8');
+  } catch (error) {
+    console.error('Error reading the email template:', error);
+    throw new Error('Failed to read email template');
+  }
+
+  const year = new Date().getFullYear();
+  htmlContent = htmlContent
+    .replace('{{studentName}}', studentName)
+    .replace('{{courseName}}', courseName)
+    .replace('{{checkoutUrl}}', checkoutUrl) // Correctly use the checkout URL
+    .replace('{{year}}', year);
+
+  const mailOptions = {
+    sender: { email: process.env.EMAIL_USERNAME, name: 'Team Academixhub' },
+    to: [{ email, name: studentName }],
+    subject: `Complete your enrollment for ${courseName}`,
+    htmlContent: htmlContent,
+  };
+
+  try {
+    const info = await emailApi.sendTransacEmail(mailOptions);
+    console.log('Enrollment email sent successfully:', info);
+  } catch (error) {
+    console.error('Error sending enrollment email:', error);
+    throw new Error('Failed to send enrollment email');
+  }
+};

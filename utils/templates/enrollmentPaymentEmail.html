@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    /* Basic styling for the email body */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 20px;
+      line-height: 1.6;
+      color: #333;
+    }
+
+    /* Container to center and style the email content */
+    .email-container {
+      background-color: #ffffff;
+      border: 1px solid #dddddd;
+      border-radius: 8px;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Styling for the link button */
+    .btn {
+      display: inline-block;
+      background-color: #007bff;
+      color: #ffffff;
+      text-decoration: none;
+      padding: 12px 20px;
+      border-radius: 5px;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    /* Responsive design for smaller screens */
+    @media only screen and (max-width: 600px) {
+      .email-container {
+        padding: 15px;
+      }
+
+      .btn {
+        width: 100%;
+        text-align: center;
+        padding: 14px 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="email-container">
+    <p>Dear {{studentName}},</p>
+
+    <p>Thank you for your interest in <strong>{{courseName}}</strong>. To complete your enrollment, please click the button below to proceed with the payment:</p>
+
+    <p><a href="{{checkoutUrl}}" class="btn">Proceed to Payment</a></p>
+
+    <p>If you have any questions, feel free to reach out to our support team.</p>
+
+    <p>Best regards,<br>
+    Team Academixhub</p>
+  </div>
+</body>
+</html>

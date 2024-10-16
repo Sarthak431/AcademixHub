@@ -8,12 +8,12 @@ import { sendEnrollmentEmail } from "../utils/emailService.js";
 // @desc Enroll a student in a course
 // @route POST /api/v1/enrollments
 export const enrollInCourse = catchAsync(async (req, res, next) => {
-  const { course } = req.body;
+  const { course,student } = req.body;
   
   // Check if the student is already enrolled in the course
   const existingEnrollment = await Enrollment.findOne({
     course,
-    student: req.user.id
+    student
   });
 
   if (existingEnrollment) {
@@ -24,11 +24,11 @@ export const enrollInCourse = catchAsync(async (req, res, next) => {
 
   const enrollment = await Enrollment.create({
     course,
-    student: req.user.id
+    student
   });
 
   const curCourse = await Course.findById(course); 
-  const curUser = await User.findById(req.user.id); 
+  const curUser = await User.findById(student); 
 
   await sendEnrollmentEmail(curUser.email, curCourse.title,curCourse.id, curUser.name);
   

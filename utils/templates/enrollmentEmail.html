@@ -1,44 +1,74 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
+    /* Basic styling for the body */
     body {
-      font-family: Arial, sans-serif;  
+      font-family: Arial, sans-serif;
       background-color: #f9f9f9;
       color: #333;
       margin: 0;
       padding: 20px;
     }
+
+    /* Container to hold email content */
     .container {
       max-width: 600px;
-      margin: auto;
-      background: #fff;
+      margin: 0 auto;
+      background: #ffffff;
       border-radius: 8px;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      padding: 20px;
+      padding: 30px 20px;
     }
+
+    /* Header styling */
     h1 {
       color: #4CAF50;
       text-align: center;
+      margin-top: 0;
+      font-size: 24px;
     }
+
+    /* Paragraph text styling */
     p {
       line-height: 1.6;
       font-size: 16px;
+      margin: 15px 0;
     }
+
+    /* Button styling */
+    .button {
+      display: inline-block;
+      padding: 12px 24px;
+      color: #ffffff;
+      background-color: #4CAF50;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    /* Footer text styling */
     .footer {
-      margin-top: 20px;
+      margin-top: 30px;
       text-align: center;
       font-size: 12px;
       color: #777;
     }
-    .button {
-      display: inline-block;
-      padding: 10px 20px;
-      color: #fff;
-      background-color: #4CAF50;
-      text-decoration: none;
-      border-radius: 5px;
-      margin: 20px 0;
+
+    /* Responsive design for smaller screens */
+    @media only screen and (max-width: 600px) {
+      .container {
+        padding: 20px 15px;
+      }
+
+      .button {
+        width: 100%;
+        padding: 14px 0;
+      }
     }
   </style>
 </head>
@@ -46,7 +76,7 @@
   <div class="container">
     <h1>Congratulations, {{studentName}}!</h1>
     <p>You have successfully enrolled in the course <strong>{{courseName}}</strong>.</p>
-    <p>We're excited for you to start learning and growing your skills!</p>
+    <p>We're excited to have you on board and look forward to seeing you enhance your skills!</p>
     <p>Click the button below to access your course dashboard:</p>
     <a href="https://academixhub.onrender.com/api/v1/courses/{{courseId}}" class="button">Go to Course</a>
     <p>Best Regards,<br>Team Academixhub</p>

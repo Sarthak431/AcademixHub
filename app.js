@@ -15,13 +15,17 @@ import enrollmentRoutes from "./routes/enrollmentRoutes.js";
 import notFound from './middleware/notFound.js';
 import compression from 'compression';
 import morgan from "morgan";
+import { stripeWebhook } from './controllers/stripeWebhookController.js';
+import paymentRoutes from './routes/paymentRoutes.js'; // Import your payment routes
 
 const app = express();
+app.set('trust proxy', 1); // 1 means trust the first proxy
 
 // Logger - Use in development mode only
 if (process.env.NODE_ENV === "development") {
     app.use(morgan('dev'));
 }
+app.post('/webhook', express.raw({ type: 'application/json' }), stripeWebhook);
 
 // Security Middleware
 app.use(helmet()); // Set security HTTP headers
@@ -48,6 +52,7 @@ app.get('/health', (req, res) => {
     res.status(200).json({ status: 'ok', timestamp: new Date() });
 });
 
+
 // Define Routes
 app.use("/api/v1/courses", courseRoutes);
 app.use("/api/v1/auth", authRoutes);
@@ -55,6 +60,7 @@ app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/lessons", lessonRoutes);
 app.use("/api/v1/enrollments", enrollmentRoutes);
 app.use("/api/v1/reviews", reviewRoutes);
+app.use("/api/v1/payments", paymentRoutes);
 
 // Error Handling
 app.use(notFound);

@@ -12,7 +12,6 @@ const router = express.Router();
 
 router.use(protect);
 
-router.post("/", restrictTo("student"), enrollInCourse);
 
 router.get(
   "/course/:courseId",
@@ -25,5 +24,6 @@ router.use(restrictTo("admin"));
 router.get("/student/:studentId", getEnrollmentsByStudent);
 router.delete("/:id", deleteEnrollment);
 router.get("/:id", getEnrollmentById);
+router.post("/", enrollInCourse);
 
 export default router;

@@ -1,1 +1,4 @@
 $ find . -type f -exec sh -c 'echo "File: $(realpath {})" >> output.txt; cat {} >> output.txt; echo -e "\n" >> output.txt' \;
+
+
+find . -type f ! -path './node_modules/*' ! -path './.git/*' ! -name 'package-lock.json' -exec sh -c 'echo "File: $(realpath {})" >> output.txt; cat {} >> output.txt; echo -e "\n" >> output.txt' \;
