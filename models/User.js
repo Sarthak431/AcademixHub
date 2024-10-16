@@ -1,13 +1,7 @@
-<<<<<<< HEAD
-import mongoose from "mongoose";
-import validator from "validator";
-import bcrypt from "bcryptjs";
-=======
 import mongoose from "mongoose";
 import validator from "validator";
 import bcrypt from "bcryptjs";
 import crypto from "crypto"; // Import crypto for token generation
->>>>>>> c9a0c724aff241a01a61cae071ef17014cd335ea
 
 <<<<<<< HEAD
 const userSchema = new mongoose.Schema({
@@ -157,4 +151,8 @@ const User = mongoose.model("User", userSchema);
 
 export default User;
 
+<<<<<<< HEAD
+
+=======
 >>>>>>> c9a0c724aff241a01a61cae071ef17014cd335ea
+>>>>>>> 691d433aadfb7aa620a8adf345bc4a2645184daa

@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import mongoose from "mongoose";
-=======
 import mongoose from 'mongoose';
->>>>>>> c9a0c724aff241a01a61cae071ef17014cd335ea
 
 <<<<<<< HEAD
 const lessonSchema = new mongoose.Schema({
@@ -64,4 +60,8 @@ const Lesson = mongoose.model('Lesson', lessonSchema);
 
 export default Lesson;
 
+<<<<<<< HEAD
+
+=======
 >>>>>>> c9a0c724aff241a01a61cae071ef17014cd335ea
+>>>>>>> 691d433aadfb7aa620a8adf345bc4a2645184daa
