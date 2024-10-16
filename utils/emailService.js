@@ -28,6 +28,7 @@ export const sendWelcomeEmail = async (email, username) => {
   // Replace placeholders in the template with actual values
   htmlContent = htmlContent
     .replace('{{username}}', username)
+    .replace('{{url}}', `${req.protocol}://${req.get('host')}`)
     .replace('{{year}}', new Date().getFullYear());
 
   const mailOptions = {
@@ -64,6 +65,7 @@ export const sendEnrollmentEmail = async (email, courseName, courseId, studentNa
     .replace('{{studentName}}', studentName)
     .replace('{{courseName}}', courseName)
     .replace('{{courseId}}', courseId)
+    .replace('{{url}}', `${req.protocol}://${req.get('host')}`)
     .replace('{{year}}', year);
 
   const mailOptions = {

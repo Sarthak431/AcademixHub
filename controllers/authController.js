@@ -3,7 +3,6 @@ import jwt from "jsonwebtoken";
 import catchAsync from "../utils/catchAsync.js";
 import AppError from "../utils/AppError.js";
 import { sendWelcomeEmail, sendResetPasswordEmail } from "../utils/emailService.js";
-import crypto from 'crypto';
 
 const signToken = (userId) => {
   return jwt.sign({ userId }, process.env.JWT_SECRET, {

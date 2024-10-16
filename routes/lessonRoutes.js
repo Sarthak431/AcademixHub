@@ -23,6 +23,7 @@ router.patch("/:id/complete", restrictTo("student"), completeLesson);
 router.use(restrictTo("admin", "instructor"));
 
 router.post("/", upload.single("video"), createLesson);
+
 router.patch('/:id', upload.single("video"), updateLesson); 
 
 router.delete("/:id", deleteLesson);
