@@ -1,8 +1,6 @@
 import mongoose from "mongoose";
 import Course from "./Course.js";
 
-
-
 const reviewSchema = new mongoose.Schema(
   {
     review: {
@@ -68,9 +66,6 @@ reviewSchema.pre("findOneAndDelete", async function (next) {
 
   if (review) {
     const course = await Course.findById(review.course);
-    if (course) {
-      const Review = mongoose.model("Review");
-
       const result = await Review.aggregate([
         { $match: { course: course._id, _id: { $ne: review._id } } },
         { $group: { _id: "$course", averageRating: { $avg: "$rating" } } },
@@ -80,7 +75,7 @@ reviewSchema.pre("findOneAndDelete", async function (next) {
 
       await course.save();
     }
-  }
+  
   next();
 });
 

@@ -25,6 +25,7 @@ app.set('trust proxy', 1); // 1 means trust the first proxy
 if (process.env.NODE_ENV === "development") {
     app.use(morgan('dev'));
 }
+
 app.post('/webhook', express.raw({ type: 'application/json' }), stripeWebhook);
 
 // Security Middleware

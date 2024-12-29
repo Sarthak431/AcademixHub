@@ -15,7 +15,7 @@ const enrollmentSchema = new mongoose.Schema(
     },
     enrollment_date: {
       type: Date,
-      default: Date.now,
+      default: Date.now(),
     },
     progress: {
       type: Number,
@@ -38,7 +38,7 @@ const enrollmentSchema = new mongoose.Schema(
 enrollmentSchema.pre("save", async function (next) {
   const enrollment = this;
 
-  const course = await Course.findById(enrollment.course).populate("lessons");
+  const course = await Course.findById(enrollment.course);
 
   if (course.lessons.length > 0) {
     enrollment.progress =
