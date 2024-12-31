@@ -8,20 +8,9 @@ import Enrollment from "../models/Enrollment.js";
 // @route POST /api/v1/courses/:courseId/reviews or /api/v1/reviews
 export const createReview = catchAsync(async (req, res, next) => {
   const { rating, review } = req.body;
-
-  // Validate input
-  if (!rating || rating < 1 || rating > 5) {
-    return next(new AppError("Rating must be between 1 and 5", 400));
-  }
-  if (!review || review.trim() === '') {
-    return next(new AppError("Review cannot be empty", 400));
-  }
-
+  
   // Ensure the course exists
-  const filter = {
-    _id: req.params.courseId ? req.params.courseId : req.body.course,
-  };
-  const course = await Course.findById(filter._id);
+  const course = await Course.findById(req.params.courseId || req.body.course);
   if (!course) {
     return next(new AppError("Course not found", 404));
   }
@@ -29,7 +18,7 @@ export const createReview = catchAsync(async (req, res, next) => {
   // Check if the user is enrolled in the course
   const isEnrolled = await Enrollment.findOne({
     student: req.user.id,
-    course: filter._id,
+    course: course._id
   });
 
   if (!isEnrolled) {
@@ -39,7 +28,7 @@ export const createReview = catchAsync(async (req, res, next) => {
   // Check for duplicate review
   const existingReview = await Review.findOne({
     user: req.user.id,
-    course: filter._id,
+    course: course._id,
   });
 
   if (existingReview) {
@@ -50,7 +39,7 @@ export const createReview = catchAsync(async (req, res, next) => {
   const newReview = await Review.create({
     review,
     rating,
-    course: filter._id,
+    course: course._id,
     user: req.user.id,
   });
 
